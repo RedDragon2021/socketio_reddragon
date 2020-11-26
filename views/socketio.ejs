@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Chat by KakaMik</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="title text-center mt-3">
+            <h3>Real-time Chat (Socket.io)</h3>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 id="_showUsername" class="text-center">Anonymous</h4>
+            </div>
+            
+            <div class="card-body">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="_username" placeholder="Your Username">
+                    <div class="input-group-append">
+                        <button class="btn btn-warning" id="_btnChangeUsername">Change</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-box">
+                <ul class="list-group list-group-flush" id="_msgList"></ul>
+                <div class="info" id="_showTyping"></div>
+            </div>
+
+            <form>
+            <div class="card-footer">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="_msg" placeholder="Input new message">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" id="_btnSendMsg">Send</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+
+            <div class="text-center">
+                <h4 class="btn btn-outline-dark mt-2">
+                    by <b>KakaMik</b>
+                </h4>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(function () {
+            let socket = io();
+
+            $('#_btnChangeUsername').click(function () {
+                let username = $('#_username').val();
+                socket.emit('changeUsername', { username });
+                $('#_showUsername').html(username);
+                $('#_username').val('');
+            });
+
+            $('#_btnSendMsg').click(function () {
+                let msg = $('#_msg').val();
+                socket.emit('sendMsg', { msg });
+                $('#_msg').val('');
+            });
+
+            socket.on('receiveMsg', (data) => {
+                let { username, msg } = data;
+                // alert("receiveMsg from Server data = "+JSON.stringify(data));
+                let myUsername = $('#_showUsername').html();
+                // alert("username/myUsername = "+username+"/"+myUsername);
+                if (username == myUsername) {
+                    $('#_msgList').append($('<li class="list-group-item text-right bg-light">').html('<b>'+ username + "</b>: " + msg));
+                } else {
+                    $('#_msgList').append($('<li class="list-group-item">').html('<b>'+ username + "</b>: " + msg));
+
+                }
+            });
+
+            $('#_msg').on('input', function () {
+                // alert("you are typing");
+                socket.emit('isTyping');
+            });
+
+            socket.on('isTyping', (data) => {
+                // $('#_showTyping').html(data.username+" is typing...");
+                let showing = $('#_showTyping').html();
+                let username = data.username;
+                if (!showing.includes(username)) {
+                    let newShow = username + " is typing...<br>";
+                    $('#_showTyping').append(newShow);
+                    setTimeout(() => {
+                        showing = $('#_showTyping').html();
+                        $('#_showTyping').html(showing.replace(newShow, ""));
+                    }, 5000);
+                }
+            });
+
+            $('form').submit(function(e){
+                e.preventDefault();
+            });
+        });
+    </script>
+</body>
+
+</html>
