@@ -3,7 +3,7 @@ const socket_io = require('socket.io');
 const path = require('path');
 const app = express();
 
-const port = process.env.PORT || 8889;
+const port = process.env.PORT || 3000;
 
 app.set('port', port);
 app.set('view engine', 'ejs');
