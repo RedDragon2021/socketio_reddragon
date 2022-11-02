@@ -62,14 +62,25 @@
 
             $('#_btnChangeUsername').click(function () {
                 let username = $('#_username').val();
-                socket.emit('changeUsername', { username });
+
+                //NEW
+                if(username=="")
+                    return;
+                $('title').html('['+username+']'+' Real-time Chat by KakaMik & Red Dragon');
+                //socket.emit('changeUsername', { username });      
+
                 $('#_showUsername').html(username);
                 $('#_username').val('');
             });
 
             $('#_btnSendMsg').click(function () {
                 let msg = $('#_msg').val();
-                socket.emit('sendMsg', { msg });
+                
+                //NEW
+                let username = $('#_showUsername').html();
+                socket.emit('sendMsg', { username, msg });
+
+                // socket.emit('sendMsg', { msg });
                 $('#_msg').val('');
             });
 
@@ -82,13 +93,21 @@
                     $('#_msgList').append($('<li class="list-group-item text-right bg-light">').html('<b>'+ username + "</b>: " + msg));
                 } else {
                     $('#_msgList').append($('<li class="list-group-item">').html('<b>'+ username + "</b>: " + msg));
-
                 }
+
+                $('#_msg').focus();
+                $("html, body").animate({
+                    scrollTop: $('html, body').get(0).scrollHeight
+                }, 2000);
             });
 
             $('#_msg').on('input', function () {
                 // alert("you are typing");
-                socket.emit('isTyping');
+                // socket.emit('isTyping');
+
+                //NEW
+                let username = $('#_showUsername').html();
+                socket.emit('isTyping', { username });
             });
 
             socket.on('isTyping', (data) => {
