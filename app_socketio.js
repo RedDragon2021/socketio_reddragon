@@ -26,19 +26,26 @@ io.on("connection", (socket)=>{
 
     socket.username = "Anonymous";
 
+    /*
     socket.on('changeUsername', (data)=>{
         console.log('changeUsername data = '+JSON.stringify(data));
         socket.username = data.username;
     });
+    */
 
     socket.on('sendMsg', (data)=>{
         console.log('Client sendMsg data = '+JSON.stringify(data));
-        // socket.msg = data.msg;
-        io.emit('receiveMsg', { username:socket.username, msg: data.msg });
+   
+        // io.emit('receiveMsg', { username:socket.username, msg: data.msg });
+
+        //NEW
+        io.emit('receiveMsg', { username: data.username, msg: data.msg });
     });
 
-    socket.on('isTyping', ()=>{
-        io.emit('isTyping', { username:socket.username});
+    // socket.on('isTyping', ()=>{ 
+    socket.on('isTyping', (data)=>{     //NEW
+        // io.emit('isTyping', { username:socket.username});
+        io.emit('isTyping', { username: data.username });  //NEW
     });
 
 });
